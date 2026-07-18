@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutGrid, ListOrdered, LogOut, Zap } from "lucide-react";
 import { clsx } from "clsx";
@@ -24,10 +25,13 @@ export function AdminShell({ children, email }: { children: React.ReactNode; ema
     <div className="flex min-h-screen bg-canvas">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-line bg-canvas-raised p-5 md:flex">
         <div className="flex items-center gap-2 px-1 font-display text-lg font-semibold">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink text-canvas">
-            <Zap className="h-4 w-4" strokeWidth={2.5} />
-          </span>
-          Pulse Admin
+          <Image 
+            src="/logo.png" 
+            alt="Pulse Admin Logo" 
+            width={150} 
+            height={50} 
+            className="h-10 w-auto object-contain"
+          />
         </div>
         <nav className="mt-8 flex flex-col gap-1">
           {NAV.map((item) => {
