@@ -28,14 +28,13 @@ export default async function HomePage() {
               </span>
               <div className="mt-6">
                 <h1 className="font-display text-4xl font-semibold leading-[1.05] sm:text-5xl">
-                  Social growth you can
+                  Social media growth you can
                   <br />
                   <span className="hero-text-gradient">watch happen.</span>
                 </h1>
-                <p className="mt-4 max-w-md text-ink-soft">
-                  Order engagement for Instagram, TikTok, YouTube, Telegram and more — then track
-                  every delivery live, down to the minute, from a single order ID.
-                </p>
+                <h2 className="mt-4 max-w-md text-ink-soft text-base font-normal">
+                  Order high-quality engagement—buy Instagram followers, TikTok views, YouTube subscribers, and Telegram members. Track every delivery live, down to the minute. The ultimate SMM Panel experience.
+                </h2>
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
@@ -112,7 +111,7 @@ export default async function HomePage() {
         {/* Trending services */}
         <section className="mt-14">
           <div className="mb-5 flex items-end justify-between">
-            <h2 className="font-display text-2xl font-semibold">Trending services</h2>
+            <h2 className="font-display text-2xl font-semibold">Top Social Media Growth Services</h2>
             <Link href="/order" className="text-sm font-medium text-accent hover:underline">
               View all platforms
             </Link>
