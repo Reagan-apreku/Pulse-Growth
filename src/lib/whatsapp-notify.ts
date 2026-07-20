@@ -20,10 +20,43 @@ export async function sendAutomatedWhatsAppMessage(toPhone: string, message: str
   const formattedPhone = formatWhatsAppPhone(toPhone);
   if (!formattedPhone) return false;
 
+  const metaToken = process.env.META_WHATSAPP_TOKEN;
+  const metaPhoneId = process.env.META_WHATSAPP_PHONE_ID;
+
+  // 1. Meta WhatsApp Cloud API (1,000 FREE messages/month forever)
+  if (metaToken && metaPhoneId) {
+    try {
+      const url = `https://graph.facebook.com/v19.0/${metaPhoneId}/messages`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${metaToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messaging_product: "whatsapp",
+          recipient_type: "individual",
+          to: formattedPhone,
+          type: "text",
+          text: { preview_url: false, body: message },
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.messages?.[0]?.id) {
+        console.log(`[Meta WhatsApp Cloud API] Automated message sent to ${formattedPhone}`);
+        return true;
+      } else {
+        console.error("[Meta WhatsApp Cloud API] Failed:", data);
+      }
+    } catch (err) {
+      console.error("[Meta WhatsApp Cloud API] Error:", err);
+    }
+  }
+
   const ultraInstance = process.env.ULTRAMSG_INSTANCE_ID || process.env.WHATSAPP_INSTANCE_ID;
   const ultraToken = process.env.ULTRAMSG_TOKEN || process.env.WHATSAPP_TOKEN;
 
-  // 1. UltraMsg Gateway Integration
+  // 2. UltraMsg Gateway Integration
   if (ultraInstance && ultraToken) {
     try {
       const url = `https://api.ultramsg.com/${ultraInstance}/messages/chat`;
@@ -38,15 +71,16 @@ export async function sendAutomatedWhatsAppMessage(toPhone: string, message: str
       });
       const data = await res.json();
       if (res.ok && data.sent) {
-        console.log(`[WhatsApp Automated Bot] Message sent to ${formattedPhone}`);
+        console.log(`[UltraMsg WhatsApp Bot] Message sent to ${formattedPhone}`);
         return true;
       } else {
-        console.error("[WhatsApp Automated Bot] Failed to send via UltraMsg:", data);
+        console.error("[UltraMsg WhatsApp Bot] Failed to send via UltraMsg:", data);
       }
     } catch (err) {
-      console.error("[WhatsApp Automated Bot] UltraMsg Error:", err);
+      console.error("[UltraMsg WhatsApp Bot] UltraMsg Error:", err);
     }
   }
+
 
   // Fallback: log attempt
   console.log(`[WhatsApp Automated Bot — No API credentials configured]`);
