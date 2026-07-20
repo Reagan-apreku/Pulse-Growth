@@ -153,9 +153,30 @@ export function AdminShell({ children, email }: { children: React.ReactNode; ema
       </header>
 
       <div className="flex-1 overflow-x-hidden">
-        <main className="p-4 sm:p-8">{children}</main>
+        <main className="p-4 pb-20 sm:p-8 md:pb-8">{children}</main>
       </div>
+
+      {/* Mobile Fixed Bottom Navigation Bar (App-Style) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-line bg-canvas-raised/95 py-2 backdrop-blur-lg md:hidden">
+        {NAV.map((item) => {
+          const active = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={clsx(
+                "flex flex-col items-center gap-1 px-3 py-1 text-[11px] font-semibold transition-colors",
+                active ? "text-accent font-bold" : "text-ink-soft hover:text-ink"
+              )}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
+
 
