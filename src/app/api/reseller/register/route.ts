@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { registerReseller } from "@/lib/resellers";
+import { notifyAdminNewReseller } from "@/lib/telegram-notify";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -19,6 +20,12 @@ export async function POST(req: NextRequest) {
     phone: body.phone,
   });
 
+  // Send Telegram notification to admin for approval
+  await notifyAdminNewReseller(reseller).catch((err) => {
+    console.error("Failed to send Telegram reseller alert:", err);
+  });
+
   return NextResponse.json({ reseller }, { status: 201 });
 }
+
 
