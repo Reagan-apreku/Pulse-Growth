@@ -207,78 +207,138 @@ export default function AdminCouponsPage() {
         </form>
       </div>
 
-      {/* Coupons Table */}
-      <div className="bento p-6">
+      {/* Coupons Table & Mobile Cards */}
+      <div className="bento p-4 sm:p-6">
         <h2 className="mb-4 font-medium">All Coupons</h2>
         {loading ? (
           <p className="py-8 text-center text-sm text-ink-soft">Loading coupons…</p>
         ) : coupons.length === 0 ? (
           <p className="py-8 text-center text-sm text-ink-soft">No coupons created yet.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-line text-xs uppercase tracking-wide text-ink-faint">
-                  <th className="py-2.5 pr-4 font-medium">Code</th>
-                  <th className="py-2.5 pr-4 font-medium">Discount</th>
-                  <th className="py-2.5 pr-4 font-medium">Usage</th>
-                  <th className="py-2.5 pr-4 font-medium">Status</th>
-                  <th className="py-2.5 pr-4 font-medium text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {coupons.map((c) => (
-                  <tr key={c.id} className="border-b border-line/70 last:border-0">
-                    <td className="py-3 pr-4 font-data font-bold tracking-wide text-ink">
-                      {c.code}
-                    </td>
-                    <td className="py-3 pr-4 font-data font-medium">
-                      {c.discountType === "percentage" ? `${c.discountValue}% OFF` : `₵${c.discountValue.toFixed(2)} OFF`}
-                    </td>
-                    <td className="py-3 pr-4 text-xs text-ink-soft font-data">
-                      {c.usedCount} used {c.maxUses !== null ? `/ ${c.maxUses} max` : "(Unlimited)"}
-                    </td>
-                    <td className="py-3 pr-4">
-                      <span
-                        className={clsx(
-                          "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
-                          c.active ? "bg-signal-soft text-signal" : "bg-warn-soft text-warn"
-                        )}
-                      >
-                        {c.active ? "Active" : "Inactive"}
+          <div>
+            {/* Mobile Cards View */}
+            <div className="space-y-3 md:hidden">
+              {coupons.map((c) => (
+                <div key={c.id} className="rounded-2xl border border-line bg-canvas p-4 text-xs space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-data text-sm font-bold tracking-wide text-ink">{c.code}</span>
+                    <span
+                      className={clsx(
+                        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize",
+                        c.active ? "bg-signal-soft text-signal" : "bg-warn-soft text-warn"
+                      )}
+                    >
+                      {c.active ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-xl bg-canvas-raised p-2.5 font-data">
+                    <div>
+                      <span className="text-ink-faint block text-[10px]">Discount</span>
+                      <span className="font-semibold text-accent text-xs">
+                        {c.discountType === "percentage" ? `${c.discountValue}% OFF` : `₵${c.discountValue.toFixed(2)} OFF`}
                       </span>
-                    </td>
-                    <td className="py-3 pr-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleToggle(c.code, c.active)}
-                          className={clsx(
-                            "flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors",
-                            c.active
-                              ? "bg-canvas text-ink-soft hover:bg-warn-soft hover:text-warn"
-                              : "bg-signal-soft text-signal hover:opacity-80"
-                          )}
-                          title={c.active ? "Deactivate" : "Activate"}
-                        >
-                          <Power className="h-3.5 w-3.5" />
-                          {c.active ? "Deactivate" : "Activate"}
-                        </button>
-                        <button
-                          onClick={() => handleDelete(c.code)}
-                          className="rounded-lg p-1 text-ink-faint transition-colors hover:bg-danger-soft hover:text-danger"
-                          title="Delete"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-ink-faint block text-[10px]">Usage Count</span>
+                      <span className="text-ink-soft">
+                        {c.usedCount} used {c.maxUses !== null ? `/ ${c.maxUses} max` : "(Unlimited)"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-1 flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => handleToggle(c.code, c.active)}
+                      className={clsx(
+                        "flex-1 flex items-center justify-center gap-1 rounded-xl py-2 text-xs font-medium transition-colors",
+                        c.active
+                          ? "bg-canvas border border-line text-ink-soft hover:bg-warn-soft hover:text-warn"
+                          : "bg-signal-soft text-signal hover:opacity-80"
+                      )}
+                    >
+                      <Power className="h-3.5 w-3.5" />
+                      {c.active ? "Deactivate" : "Activate"}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(c.code)}
+                      className="rounded-xl border border-line bg-canvas px-3 py-2 text-ink-faint transition-colors hover:bg-danger-soft hover:text-danger"
+                      title="Delete"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-line text-xs uppercase tracking-wide text-ink-faint">
+                    <th className="py-2.5 pr-4 font-medium">Code</th>
+                    <th className="py-2.5 pr-4 font-medium">Discount</th>
+                    <th className="py-2.5 pr-4 font-medium">Usage</th>
+                    <th className="py-2.5 pr-4 font-medium">Status</th>
+                    <th className="py-2.5 pr-4 font-medium text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {coupons.map((c) => (
+                    <tr key={c.id} className="border-b border-line/70 last:border-0">
+                      <td className="py-3 pr-4 font-data font-bold tracking-wide text-ink">
+                        {c.code}
+                      </td>
+                      <td className="py-3 pr-4 font-data font-medium">
+                        {c.discountType === "percentage" ? `${c.discountValue}% OFF` : `₵${c.discountValue.toFixed(2)} OFF`}
+                      </td>
+                      <td className="py-3 pr-4 text-xs text-ink-soft font-data">
+                        {c.usedCount} used {c.maxUses !== null ? `/ ${c.maxUses} max` : "(Unlimited)"}
+                      </td>
+                      <td className="py-3 pr-4">
+                        <span
+                          className={clsx(
+                            "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
+                            c.active ? "bg-signal-soft text-signal" : "bg-warn-soft text-warn"
+                          )}
+                        >
+                          {c.active ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td className="py-3 pr-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleToggle(c.code, c.active)}
+                            className={clsx(
+                              "flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors",
+                              c.active
+                                ? "bg-canvas text-ink-soft hover:bg-warn-soft hover:text-warn"
+                                : "bg-signal-soft text-signal hover:opacity-80"
+                            )}
+                            title={c.active ? "Deactivate" : "Activate"}
+                          >
+                            <Power className="h-3.5 w-3.5" />
+                            {c.active ? "Deactivate" : "Activate"}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(c.code)}
+                            className="rounded-lg p-1 text-ink-faint transition-colors hover:bg-danger-soft hover:text-danger"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
+
     </div>
   );
 }

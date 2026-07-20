@@ -126,111 +126,204 @@ export default function AdminResellersPage() {
         </div>
       </div>
 
-      {/* Resellers Table */}
-      <div className="bento p-6">
+      {/* Resellers Table & Mobile Cards */}
+      <div className="bento p-4 sm:p-6">
         <h2 className="mb-4 font-medium">All Reseller Accounts</h2>
         {loading ? (
           <p className="py-8 text-center text-sm text-ink-soft">Loading resellers…</p>
         ) : resellers.length === 0 ? (
           <p className="py-8 text-center text-sm text-ink-soft">No resellers registered yet.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-line text-xs uppercase tracking-wide text-ink-faint">
-                  <th className="py-2.5 pr-4 font-medium">Reseller Name</th>
-                  <th className="py-2.5 pr-4 font-medium">Business</th>
-                  <th className="py-2.5 pr-4 font-medium">Email / Phone</th>
-                  <th className="py-2.5 pr-4 font-medium">Discount Rate</th>
-                  <th className="py-2.5 pr-4 font-medium">Orders / Total</th>
-                  <th className="py-2.5 pr-4 font-medium">Status</th>
-                  <th className="py-2.5 pr-4 font-medium text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {resellers.map((r) => (
-                  <tr key={r.id} className="border-b border-line/70 last:border-0">
-                    <td className="py-3 pr-4 font-medium">{r.name}</td>
-                    <td className="py-3 pr-4 text-ink-soft">{r.businessName || "Personal"}</td>
-                    <td className="py-3 pr-4 text-xs font-data">
-                      <div>{r.email}</div>
-                      {r.phone && <div className="text-ink-faint">{r.phone}</div>}
-                    </td>
-                    <td className="py-3 pr-4 font-data font-semibold text-accent">
-                      {r.discountPercentage}% OFF
-                    </td>
-                    <td className="py-3 pr-4 font-data text-xs">
-                      {r.totalOrders} orders · ₵{r.totalSpent.toFixed(2)}
-                    </td>
-                    <td className="py-3 pr-4">
-                      <span
-                        className={clsx(
-                          "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
-                          r.status === "active"
-                            ? "bg-signal-soft text-signal"
-                            : r.status === "pending"
-                            ? "bg-warn-soft text-warn"
-                            : "bg-danger-soft text-danger"
-                        )}
-                      >
-                        {r.status === "pending" ? "Pending Approval" : r.status}
-                      </span>
-                    </td>
-                    <td className="py-3 pr-4 text-right">
-                      {r.status === "pending" ? (
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => setResellerStatus(r.id, "active")}
-                            className="inline-flex items-center gap-1 rounded-lg bg-signal-soft px-3 py-1 text-xs font-semibold text-signal hover:opacity-90"
-                          >
-                            <Check className="h-3.5 w-3.5" /> Approve
-                          </button>
-                          <button
-                            onClick={() => setResellerStatus(r.id, "inactive")}
-                            className="inline-flex items-center gap-1 rounded-lg border border-line bg-canvas px-2.5 py-1 text-xs font-medium text-ink-soft hover:bg-danger-soft hover:text-danger"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-end gap-2">
-                          {r.status === "active" && (
-                            <a
-                              href={`https://api.whatsapp.com/send?phone=${formatWhatsAppPhone(r.phone || "")}&text=${encodeURIComponent(
-                                `Hi ${r.name}, your Pulse Wholesale Reseller account has been APPROVED! 🎉 You can now log in at https://pulsegh.com/reseller to enjoy 10% wholesale rates on all orders.`
-                              )}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 rounded-lg bg-signal-soft px-2.5 py-1 text-xs font-semibold text-signal hover:opacity-90"
-                              title="Send WhatsApp Approval Message"
-                            >
-                              WhatsApp Notify
-                            </a>
-
-                          )}
-                          <button
-                            onClick={() => setResellerStatus(r.id, r.status === "active" ? "inactive" : "active")}
-                            className={clsx(
-                              "inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors",
-                              r.status === "active"
-                                ? "bg-canvas text-ink-soft hover:bg-warn-soft hover:text-warn"
-                                : "bg-signal-soft text-signal hover:opacity-80"
-                            )}
-                          >
-                            <Power className="h-3.5 w-3.5" />
-                            {r.status === "active" ? "Deactivate" : "Activate"}
-                          </button>
-                        </div>
+          <div>
+            {/* Mobile Cards View */}
+            <div className="space-y-3 md:hidden">
+              {resellers.map((r) => (
+                <div key={r.id} className="rounded-2xl border border-line bg-canvas p-4 text-xs space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="font-semibold text-sm text-ink">{r.name}</h3>
+                      <p className="text-ink-soft">{r.businessName || "Personal Account"}</p>
+                    </div>
+                    <span
+                      className={clsx(
+                        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize shrink-0",
+                        r.status === "active"
+                          ? "bg-signal-soft text-signal"
+                          : r.status === "pending"
+                          ? "bg-warn-soft text-warn"
+                          : "bg-danger-soft text-danger"
                       )}
-                    </td>
+                    >
+                      {r.status === "pending" ? "Pending Approval" : r.status}
+                    </span>
+                  </div>
 
+                  <div className="grid grid-cols-2 gap-2 rounded-xl bg-canvas-raised p-2.5 font-data">
+                    <div>
+                      <span className="text-ink-faint block text-[10px]">Email</span>
+                      <span className="truncate block font-medium">{r.email}</span>
+                    </div>
+                    <div>
+                      <span className="text-ink-faint block text-[10px]">Phone</span>
+                      <span className="font-medium">{r.phone || "N/A"}</span>
+                    </div>
+                    <div>
+                      <span className="text-ink-faint block text-[10px]">Discount</span>
+                      <span className="font-semibold text-accent">{r.discountPercentage}% OFF</span>
+                    </div>
+                    <div>
+                      <span className="text-ink-faint block text-[10px]">Volume</span>
+                      <span>{r.totalOrders} orders (₵{r.totalSpent.toFixed(2)})</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-1 flex items-center justify-end gap-2">
+                    {r.status === "pending" ? (
+                      <>
+                        <button
+                          onClick={() => setResellerStatus(r.id, "active")}
+                          className="flex-1 inline-flex items-center justify-center gap-1 rounded-xl bg-signal-soft py-2 text-xs font-semibold text-signal hover:opacity-90"
+                        >
+                          <Check className="h-3.5 w-3.5" /> Approve
+                        </button>
+                        <button
+                          onClick={() => setResellerStatus(r.id, "inactive")}
+                          className="flex-1 inline-flex items-center justify-center gap-1 rounded-xl border border-line bg-canvas py-2 text-xs font-medium text-ink-soft hover:bg-danger-soft hover:text-danger"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        {r.status === "active" && (
+                          <a
+                            href={`https://api.whatsapp.com/send?phone=${formatWhatsAppPhone(r.phone || "")}&text=${encodeURIComponent(
+                              `Hi ${r.name}, your Pulse Wholesale Reseller account has been APPROVED! 🎉 You can now log in at https://pulsegh.com/reseller to enjoy 10% wholesale rates on all orders.`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 inline-flex items-center justify-center gap-1 rounded-xl bg-signal-soft py-2 text-xs font-semibold text-signal hover:opacity-90"
+                          >
+                            WhatsApp Notify
+                          </a>
+                        )}
+                        <button
+                          onClick={() => setResellerStatus(r.id, r.status === "active" ? "inactive" : "active")}
+                          className={clsx(
+                            "flex-1 inline-flex items-center justify-center gap-1 rounded-xl py-2 text-xs font-medium transition-colors",
+                            r.status === "active"
+                              ? "bg-canvas border border-line text-ink-soft hover:bg-warn-soft hover:text-warn"
+                              : "bg-signal-soft text-signal hover:opacity-80"
+                          )}
+                        >
+                          <Power className="h-3.5 w-3.5" />
+                          {r.status === "active" ? "Deactivate" : "Activate"}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-line text-xs uppercase tracking-wide text-ink-faint">
+                    <th className="py-2.5 pr-4 font-medium">Reseller Name</th>
+                    <th className="py-2.5 pr-4 font-medium">Business</th>
+                    <th className="py-2.5 pr-4 font-medium">Email / Phone</th>
+                    <th className="py-2.5 pr-4 font-medium">Discount Rate</th>
+                    <th className="py-2.5 pr-4 font-medium">Orders / Total</th>
+                    <th className="py-2.5 pr-4 font-medium">Status</th>
+                    <th className="py-2.5 pr-4 font-medium text-right">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {resellers.map((r) => (
+                    <tr key={r.id} className="border-b border-line/70 last:border-0">
+                      <td className="py-3 pr-4 font-medium">{r.name}</td>
+                      <td className="py-3 pr-4 text-ink-soft">{r.businessName || "Personal"}</td>
+                      <td className="py-3 pr-4 text-xs font-data">
+                        <div>{r.email}</div>
+                        {r.phone && <div className="text-ink-faint">{r.phone}</div>}
+                      </td>
+                      <td className="py-3 pr-4 font-data font-semibold text-accent">
+                        {r.discountPercentage}% OFF
+                      </td>
+                      <td className="py-3 pr-4 font-data text-xs">
+                        {r.totalOrders} orders · ₵{r.totalSpent.toFixed(2)}
+                      </td>
+                      <td className="py-3 pr-4">
+                        <span
+                          className={clsx(
+                            "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
+                            r.status === "active"
+                              ? "bg-signal-soft text-signal"
+                              : r.status === "pending"
+                              ? "bg-warn-soft text-warn"
+                              : "bg-danger-soft text-danger"
+                          )}
+                        >
+                          {r.status === "pending" ? "Pending Approval" : r.status}
+                        </span>
+                      </td>
+                      <td className="py-3 pr-4 text-right">
+                        {r.status === "pending" ? (
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => setResellerStatus(r.id, "active")}
+                              className="inline-flex items-center gap-1 rounded-lg bg-signal-soft px-3 py-1 text-xs font-semibold text-signal hover:opacity-90"
+                            >
+                              <Check className="h-3.5 w-3.5" /> Approve
+                            </button>
+                            <button
+                              onClick={() => setResellerStatus(r.id, "inactive")}
+                              className="inline-flex items-center gap-1 rounded-lg border border-line bg-canvas px-2.5 py-1 text-xs font-medium text-ink-soft hover:bg-danger-soft hover:text-danger"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-end gap-2">
+                            {r.status === "active" && (
+                              <a
+                                href={`https://api.whatsapp.com/send?phone=${formatWhatsAppPhone(r.phone || "")}&text=${encodeURIComponent(
+                                  `Hi ${r.name}, your Pulse Wholesale Reseller account has been APPROVED! 🎉 You can now log in at https://pulsegh.com/reseller to enjoy 10% wholesale rates on all orders.`
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 rounded-lg bg-signal-soft px-2.5 py-1 text-xs font-semibold text-signal hover:opacity-90"
+                                title="Send WhatsApp Approval Message"
+                              >
+                                WhatsApp Notify
+                              </a>
+                            )}
+                            <button
+                              onClick={() => setResellerStatus(r.id, r.status === "active" ? "inactive" : "active")}
+                              className={clsx(
+                                "inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors",
+                                r.status === "active"
+                                  ? "bg-canvas text-ink-soft hover:bg-warn-soft hover:text-warn"
+                                  : "bg-signal-soft text-signal hover:opacity-80"
+                              )}
+                            >
+                              <Power className="h-3.5 w-3.5" />
+                              {r.status === "active" ? "Deactivate" : "Activate"}
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
+
     </div>
   );
 }
