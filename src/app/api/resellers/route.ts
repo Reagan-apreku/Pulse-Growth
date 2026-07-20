@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
 import { listResellers, toggleResellerStatus } from "@/lib/resellers";
+import { notifyResellerApprovedWhatsApp } from "@/lib/whatsapp-notify";
 
 async function isAuthorizedAdmin() {
   const cookieStore = await cookies();
@@ -32,5 +33,13 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Reseller not found." }, { status: 404 });
   }
 
+  // If reseller status was set to active, fire automated WhatsApp notification
+  if (body.status === "active") {
+    await notifyResellerApprovedWhatsApp(updated).catch((err) => {
+      console.error("Automated WhatsApp reseller alert error:", err);
+    });
+  }
+
   return NextResponse.json({ reseller: updated });
 }
+
