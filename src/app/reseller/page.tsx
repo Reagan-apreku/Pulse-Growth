@@ -82,14 +82,19 @@ export default function ResellerPortalPage() {
   const userResalePrice = parseFloat(resalePrice) || standardSubtotal * 1.25; // default 25% markup
   const estimatedProfit = Math.max(0, userResalePrice - resellerSubtotal);
 
+  const [password, setPassword] = useState("");
   const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setAuthError(null);
     setRegisterSuccess(null);
-    if (!name.trim() || !email.trim()) {
-      setAuthError("Name and email are required.");
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      setAuthError("Name, email, and password are required.");
+      return;
+    }
+    if (password.length < 6) {
+      setAuthError("Password must be at least 6 characters.");
       return;
     }
     setAuthSubmitting(true);
@@ -100,6 +105,7 @@ export default function ResellerPortalPage() {
         body: JSON.stringify({
           name: name.trim(),
           email: email.trim(),
+          password: password.trim(),
           businessName: businessName.trim() || undefined,
           phone: phone.trim() || undefined,
         }),
@@ -119,12 +125,11 @@ export default function ResellerPortalPage() {
     setAuthSubmitting(false);
   }
 
-
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setAuthError(null);
-    if (!email.trim()) {
-      setAuthError("Enter your registered email.");
+    if (!email.trim() || !password.trim()) {
+      setAuthError("Enter your registered email and password.");
       return;
     }
     setAuthSubmitting(true);
@@ -132,7 +137,10 @@ export default function ResellerPortalPage() {
       const res = await fetch("/api/reseller/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password.trim(),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Login failed.");
@@ -144,6 +152,7 @@ export default function ResellerPortalPage() {
     }
     setAuthSubmitting(false);
   }
+
 
   function handleLogout() {
     setReseller(null);
@@ -328,6 +337,19 @@ export default function ResellerPortalPage() {
                     </div>
 
                     <div>
+                      <label className="text-xs font-medium text-ink-faint">Password *</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="mt-1.5 w-full rounded-xl border border-line bg-canvas px-4 py-2.5 text-sm"
+                        required
+                        minLength={6}
+                      />
+                    </div>
+
+                    <div>
                       <label className="text-xs font-medium text-ink-faint">Agency / Business Name (Optional)</label>
                       <input
                         type="text"
@@ -355,7 +377,7 @@ export default function ResellerPortalPage() {
                       className="hero-cta mt-4 flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                     >
                       {authSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                      {authSubmitting ? "Creating account…" : "Activate Reseller Tier (10% OFF)"}
+                      {authSubmitting ? "Creating account…" : "Submit Application for Approval"}
                     </button>
                   </form>
                 ) : (
@@ -372,6 +394,18 @@ export default function ResellerPortalPage() {
                       />
                     </div>
 
+                    <div>
+                      <label className="text-xs font-medium text-ink-faint">Password *</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="mt-1.5 w-full rounded-xl border border-line bg-canvas px-4 py-2.5 text-sm"
+                        required
+                      />
+                    </div>
+
                     <button
                       type="submit"
                       disabled={authSubmitting}
@@ -381,6 +415,7 @@ export default function ResellerPortalPage() {
                       {authSubmitting ? "Logging in…" : "Access Reseller Portal"}
                     </button>
                   </form>
+
                 )}
               </div>
             </div>

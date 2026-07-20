@@ -87,6 +87,7 @@ export interface ResellerAccount {
   id: string;
   name: string;
   email: string;
+  passwordHash?: string;
   businessName: string | null;
   phone: string | null;
   status: "pending" | "active" | "inactive";
@@ -96,5 +97,6 @@ export interface ResellerAccount {
   createdAt: string;
   updatedAt: string;
 }
+
 
 

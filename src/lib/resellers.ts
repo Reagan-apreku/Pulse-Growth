@@ -79,6 +79,7 @@ export async function getResellerByEmail(email: string): Promise<ResellerAccount
     id: doc.id as string,
     name: doc.name as string,
     email: doc.email as string,
+    passwordHash: doc.passwordHash as string | undefined,
     businessName: (doc.businessName as string) || null,
     phone: (doc.phone as string) || null,
     status: (doc.status as "pending" | "active" | "inactive") || "pending",
@@ -90,9 +91,26 @@ export async function getResellerByEmail(email: string): Promise<ResellerAccount
   };
 }
 
+
+import crypto from "crypto";
+
+function hashPassword(password: string): string {
+  const secret = process.env.SESSION_SECRET || "pulse-reseller-salt";
+  return crypto.createHmac("sha256", secret).update(password).digest("hex");
+}
+
+export async function verifyResellerPassword(email: string, password: string): Promise<ResellerAccount | null> {
+  const reseller = await getResellerByEmail(email);
+  if (!reseller || !reseller.passwordHash) return null;
+  const hash = hashPassword(password);
+  if (hash !== reseller.passwordHash) return null;
+  return reseller;
+}
+
 export async function registerReseller(input: {
   name: string;
   email: string;
+  password: string;
   businessName?: string;
   phone?: string;
 }): Promise<ResellerAccount> {
@@ -107,6 +125,7 @@ export async function registerReseller(input: {
     id: `RSL-${Date.now().toString(36).toUpperCase()}`,
     name: input.name.trim(),
     email: formattedEmail,
+    passwordHash: hashPassword(input.password),
     businessName: input.businessName?.trim() || null,
     phone: input.phone?.trim() || null,
     status: "pending", // Resellers require admin approval before login
@@ -128,6 +147,7 @@ export async function registerReseller(input: {
   await db.collection(RESELLERS_COLLECTION).insertOne({ ...reseller });
   return reseller;
 }
+
 
 export async function toggleResellerStatus(id: string, status: "pending" | "active" | "inactive"): Promise<ResellerAccount | null> {
   const now = new Date().toISOString();
