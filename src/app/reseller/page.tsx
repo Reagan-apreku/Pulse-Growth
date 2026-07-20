@@ -89,8 +89,8 @@ export default function ResellerPortalPage() {
     e.preventDefault();
     setAuthError(null);
     setRegisterSuccess(null);
-    if (!name.trim() || !email.trim() || !password.trim()) {
-      setAuthError("Name, email, and password are required.");
+    if (!name.trim() || !email.trim() || !password.trim() || !phone.trim()) {
+      setAuthError("Name, email, password, and WhatsApp phone number are required.");
       return;
     }
     if (password.length < 6) {
@@ -106,10 +106,11 @@ export default function ResellerPortalPage() {
           name: name.trim(),
           email: email.trim(),
           password: password.trim(),
+          phone: phone.trim(),
           businessName: businessName.trim() || undefined,
-          phone: phone.trim() || undefined,
         }),
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Registration failed.");
 
@@ -365,15 +366,17 @@ export default function ResellerPortalPage() {
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium text-ink-faint">Phone Number (Optional)</label>
+                      <label className="text-xs font-medium text-ink-faint">WhatsApp Phone Number *</label>
                       <input
                         type="text"
                         placeholder="233550000000"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         className="mt-1.5 w-full rounded-xl border border-line bg-canvas px-4 py-2.5 text-sm"
+                        required
                       />
                     </div>
+
 
                     <button
                       type="submit"

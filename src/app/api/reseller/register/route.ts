@@ -4,8 +4,8 @@ import { notifyAdminNewReseller } from "@/lib/telegram-notify";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
-  if (!body || !body.name || !body.email || !body.password) {
-    return NextResponse.json({ error: "Name, email, and password are required." }, { status: 400 });
+  if (!body || !body.name || !body.email || !body.password || !body.phone) {
+    return NextResponse.json({ error: "Name, email, password, and phone number are required." }, { status: 400 });
   }
 
   if (typeof body.password !== "string" || body.password.length < 6) {
@@ -16,8 +16,8 @@ export async function POST(req: NextRequest) {
     name: body.name,
     email: body.email,
     password: body.password,
-    businessName: body.businessName,
     phone: body.phone,
+    businessName: body.businessName,
   });
 
   // Send Telegram notification to admin for approval
@@ -27,5 +27,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ reseller }, { status: 201 });
 }
+
 
 
