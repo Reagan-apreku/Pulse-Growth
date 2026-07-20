@@ -29,21 +29,20 @@ export default function AdminResellersPage() {
     loadResellers();
   }, []);
 
-  async function handleToggle(id: string, currentStatus: "active" | "inactive") {
+  async function setResellerStatus(id: string, newStatus: "pending" | "active" | "inactive") {
     setError(null);
     setSuccess(null);
-    const nextStatus = currentStatus === "active" ? "inactive" : "active";
     try {
       const res = await fetch("/api/resellers", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: nextStatus }),
+        body: JSON.stringify({ id, status: newStatus }),
       });
       if (res.ok) {
         setResellers((prev) =>
-          prev.map((r) => (r.id === id ? { ...r, status: nextStatus } : r))
+          prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
         );
-        setSuccess(`Reseller status updated to ${nextStatus}.`);
+        setSuccess(`Reseller account status set to ${newStatus}.`);
       }
     } catch {
       setError("Failed to update reseller status.");
@@ -51,6 +50,7 @@ export default function AdminResellersPage() {
   }
 
   const activeCount = resellers.filter((r) => r.status === "active").length;
+  const pendingCount = resellers.filter((r) => r.status === "pending").length;
   const totalResellerSpent = resellers.reduce((sum, r) => sum + r.totalSpent, 0);
 
   return (
@@ -58,7 +58,7 @@ export default function AdminResellersPage() {
       <div>
         <h1 className="font-display text-2xl font-semibold">Reseller Management</h1>
         <p className="mt-1 text-sm text-ink-soft">
-          Monitor partners using the 10% wholesale reseller program.
+          Review, approve, and monitor partners using the 10% wholesale reseller program.
         </p>
       </div>
 
@@ -83,6 +83,11 @@ export default function AdminResellersPage() {
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-soft text-accent">
               <Users className="h-4 w-4" />
             </span>
+            {pendingCount > 0 && (
+              <span className="rounded-full bg-warn-soft px-2.5 py-0.5 text-xs font-bold text-warn">
+                {pendingCount} Pending Approval
+              </span>
+            )}
           </div>
           <p className="mt-3 font-data text-2xl font-semibold">{resellers.length}</p>
           <p className="text-sm text-ink-soft">Total Resellers ({activeCount} Active)</p>
@@ -151,25 +156,46 @@ export default function AdminResellersPage() {
                       <span
                         className={clsx(
                           "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
-                          r.status === "active" ? "bg-signal-soft text-signal" : "bg-warn-soft text-warn"
+                          r.status === "active"
+                            ? "bg-signal-soft text-signal"
+                            : r.status === "pending"
+                            ? "bg-warn-soft text-warn"
+                            : "bg-danger-soft text-danger"
                         )}
                       >
-                        {r.status}
+                        {r.status === "pending" ? "Pending Approval" : r.status}
                       </span>
                     </td>
                     <td className="py-3 pr-4 text-right">
-                      <button
-                        onClick={() => handleToggle(r.id, r.status)}
-                        className={clsx(
-                          "inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors",
-                          r.status === "active"
-                            ? "bg-canvas text-ink-soft hover:bg-warn-soft hover:text-warn"
-                            : "bg-signal-soft text-signal hover:opacity-80"
-                        )}
-                      >
-                        <Power className="h-3.5 w-3.5" />
-                        {r.status === "active" ? "Deactivate" : "Activate"}
-                      </button>
+                      {r.status === "pending" ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => setResellerStatus(r.id, "active")}
+                            className="inline-flex items-center gap-1 rounded-lg bg-signal-soft px-3 py-1 text-xs font-semibold text-signal hover:opacity-90"
+                          >
+                            <Check className="h-3.5 w-3.5" /> Approve
+                          </button>
+                          <button
+                            onClick={() => setResellerStatus(r.id, "inactive")}
+                            className="inline-flex items-center gap-1 rounded-lg border border-line bg-canvas px-2.5 py-1 text-xs font-medium text-ink-soft hover:bg-danger-soft hover:text-danger"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setResellerStatus(r.id, r.status === "active" ? "inactive" : "active")}
+                          className={clsx(
+                            "inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors",
+                            r.status === "active"
+                              ? "bg-canvas text-ink-soft hover:bg-warn-soft hover:text-warn"
+                              : "bg-signal-soft text-signal hover:opacity-80"
+                          )}
+                        >
+                          <Power className="h-3.5 w-3.5" />
+                          {r.status === "active" ? "Deactivate" : "Activate"}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -181,3 +207,4 @@ export default function AdminResellersPage() {
     </div>
   );
 }
+

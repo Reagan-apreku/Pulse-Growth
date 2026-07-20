@@ -57,7 +57,7 @@ export async function listResellers(): Promise<ResellerAccount[]> {
     email: d.email as string,
     businessName: (d.businessName as string) || null,
     phone: (d.phone as string) || null,
-    status: d.status as "active" | "inactive",
+    status: (d.status as "pending" | "active" | "inactive") || "pending",
     discountPercentage: Number(d.discountPercentage || 10),
     totalOrders: Number(d.totalOrders || 0),
     totalSpent: Number(d.totalSpent || 0),
@@ -81,7 +81,7 @@ export async function getResellerByEmail(email: string): Promise<ResellerAccount
     email: doc.email as string,
     businessName: (doc.businessName as string) || null,
     phone: (doc.phone as string) || null,
-    status: doc.status as "active" | "inactive",
+    status: (doc.status as "pending" | "active" | "inactive") || "pending",
     discountPercentage: Number(doc.discountPercentage || 10),
     totalOrders: Number(doc.totalOrders || 0),
     totalSpent: Number(doc.totalSpent || 0),
@@ -109,7 +109,7 @@ export async function registerReseller(input: {
     email: formattedEmail,
     businessName: input.businessName?.trim() || null,
     phone: input.phone?.trim() || null,
-    status: "active", // Resellers active by default so they can start right away
+    status: "pending", // Resellers require admin approval before login
     discountPercentage: 10,
     totalOrders: 0,
     totalSpent: 0,
@@ -129,7 +129,7 @@ export async function registerReseller(input: {
   return reseller;
 }
 
-export async function toggleResellerStatus(id: string, status: "active" | "inactive"): Promise<ResellerAccount | null> {
+export async function toggleResellerStatus(id: string, status: "pending" | "active" | "inactive"): Promise<ResellerAccount | null> {
   const now = new Date().toISOString();
   if (!isMongoConfigured) {
     const list = readLocalResellers();
@@ -149,6 +149,7 @@ export async function toggleResellerStatus(id: string, status: "active" | "inact
   if (!result) return null;
   return result as unknown as ResellerAccount;
 }
+
 
 export async function recordResellerOrder(email: string, amount: number): Promise<void> {
   const formattedEmail = email.trim().toLowerCase();

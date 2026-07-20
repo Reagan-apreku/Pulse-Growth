@@ -82,9 +82,12 @@ export default function ResellerPortalPage() {
   const userResalePrice = parseFloat(resalePrice) || standardSubtotal * 1.25; // default 25% markup
   const estimatedProfit = Math.max(0, userResalePrice - resellerSubtotal);
 
+  const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
+
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setAuthError(null);
+    setRegisterSuccess(null);
     if (!name.trim() || !email.trim()) {
       setAuthError("Name and email are required.");
       return;
@@ -104,13 +107,18 @@ export default function ResellerPortalPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Registration failed.");
 
-      setReseller(data.reseller);
-      localStorage.setItem("pulse_reseller_session", JSON.stringify(data.reseller));
+      if (data.reseller.status === "pending") {
+        setRegisterSuccess("Your registration has been submitted! Your account is currently pending admin approval. You can log in once an admin approves your request.");
+      } else {
+        setReseller(data.reseller);
+        localStorage.setItem("pulse_reseller_session", JSON.stringify(data.reseller));
+      }
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : "Error during registration.");
     }
     setAuthSubmitting(false);
   }
+
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -284,6 +292,14 @@ export default function ResellerPortalPage() {
                 {authError && (
                   <div className="mt-4 rounded-xl bg-danger-soft p-3 text-xs text-danger">{authError}</div>
                 )}
+
+                {registerSuccess && (
+                  <div className="mt-4 flex items-start gap-2.5 rounded-xl bg-warn-soft p-4 text-xs text-warn font-medium leading-relaxed">
+                    <CheckCircle className="h-4 w-4 shrink-0 text-warn mt-0.5" />
+                    <span>{registerSuccess}</span>
+                  </div>
+                )}
+
 
                 {authMode === "register" ? (
                   <form onSubmit={handleRegister} className="mt-6 space-y-4">

@@ -89,11 +89,12 @@ export interface ResellerAccount {
   email: string;
   businessName: string | null;
   phone: string | null;
-  status: "active" | "inactive";
+  status: "pending" | "active" | "inactive";
   discountPercentage: number; // default 10
   totalOrders: number;
   totalSpent: number;
   createdAt: string;
   updatedAt: string;
 }
+
 
