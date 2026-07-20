@@ -204,28 +204,32 @@ export default function ResellerPortalPage() {
       <NavBar />
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-8 sm:px-8 sm:py-12">
-        {/* Banner */}
-        <div className="hero-gradient relative overflow-hidden rounded-3xl p-8 sm:p-12">
-          <div className="hero-blob hero-blob-1" />
-          <div className="hero-blob hero-blob-2" />
-          <div className="relative z-10 max-w-2xl">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-signal-soft px-3.5 py-1 text-xs font-semibold text-signal">
-              <Percent className="h-3.5 w-3.5" /> 10% Wholesale Discount Guaranteed
-            </span>
-            <h1 className="mt-4 font-display text-3xl font-semibold leading-tight sm:text-5xl">
-              Become a Pulse <span className="hero-text-gradient">Reseller</span>
-            </h1>
-            <p className="mt-3 text-ink-soft text-base">
-              Offer top-tier social media growth to your clients, agencies, and followers. Get instant 10% wholesale pricing on every order and keep 100% of your profit margin.
-            </p>
-          </div>
-        </div>
 
         {sessionLoading ? (
           <div className="py-16 text-center text-sm text-ink-soft">Loading reseller portal…</div>
         ) : !reseller ? (
+
           /* Reseller Registration / Login View */
-          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-12">
+          <div>
+            {/* Banner (Only shown before login) */}
+            <div className="hero-gradient relative overflow-hidden rounded-3xl p-8 sm:p-12 mb-8">
+              <div className="hero-blob hero-blob-1" />
+              <div className="hero-blob hero-blob-2" />
+              <div className="relative z-10 max-w-2xl">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-signal-soft px-3.5 py-1 text-xs font-semibold text-signal">
+                  <Percent className="h-3.5 w-3.5" /> 10% Wholesale Discount Guaranteed
+                </span>
+                <h1 className="mt-4 font-display text-3xl font-semibold leading-tight sm:text-5xl">
+                  Become a Pulse <span className="hero-text-gradient">Reseller</span>
+                </h1>
+                <p className="mt-3 text-ink-soft text-base">
+                  Offer top-tier social media growth to your clients, agencies, and followers. Get instant 10% wholesale pricing on every order and keep 100% of your profit margin.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+
             {/* Value Propositions */}
             <div className="space-y-4 lg:col-span-6">
               <h2 className="font-display text-2xl font-semibold">Why Resell With Pulse?</h2>
@@ -415,12 +419,14 @@ export default function ResellerPortalPage() {
                       {authSubmitting ? "Logging in…" : "Access Reseller Portal"}
                     </button>
                   </form>
-
                 )}
               </div>
             </div>
           </div>
-        ) : (
+        </div>
+      ) : (
+
+
           /* Active Reseller Dashboard & Order Interface */
           <div className="mt-8 space-y-6">
             {/* Top Reseller Status Header */}
