@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Lock, ShieldCheck, Zap, Loader2, CreditCard } from "lucide-react";
+import { Lock, ShieldCheck, Zap, Loader2, CreditCard, Tag, Check, X } from "lucide-react";
 import { clsx } from "clsx";
 import { SERVICES } from "@/lib/services";
 import { PlatformIcon } from "@/components/PlatformIcon";
@@ -25,6 +25,28 @@ export function OrderForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Machine ID tracking for 1-use enforcement
+  const [machineId, setMachineId] = useState<string>("");
+
+  // Coupon states
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountType: "percentage" | "fixed";
+    discountValue: number;
+  } | null>(null);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mId = localStorage.getItem("pulse_machine_id");
+    if (!mId) {
+      mId = `MID-${Math.random().toString(36).substring(2)}-${Date.now()}`;
+      localStorage.setItem("pulse_machine_id", mId);
+    }
+    setMachineId(mId);
+  }, []);
+
   const minOrder = serviceType.minOrder || 100;
 
   useEffect(() => {
@@ -33,18 +55,73 @@ export function OrderForm() {
     }
   }, [minOrder, quantity]);
 
-  const total = (quantity / 1000) * serviceType.ratePer1k;
+  const subtotal = (quantity / 1000) * serviceType.ratePer1k;
+
+  const discountAmount = useMemo(() => {
+    if (!appliedCoupon) return 0;
+    if (appliedCoupon.discountType === "percentage") {
+      return (subtotal * appliedCoupon.discountValue) / 100;
+    }
+    return Math.min(subtotal, appliedCoupon.discountValue);
+  }, [subtotal, appliedCoupon]);
+
+  const total = Math.max(0, subtotal - discountAmount);
 
   function handlePlatformChange(newPlatform: string) {
     setPlatform(newPlatform);
     setServiceTypeIndex(0);
   }
 
+  async function handleApplyCoupon() {
+    setCouponError(null);
+    if (!couponCode.trim()) return;
+
+    // LocalStorage check first for fast enforcement
+    const usedCoupons: string[] = JSON.parse(localStorage.getItem("pulse_used_coupons") || "[]");
+    if (usedCoupons.includes(couponCode.trim().toUpperCase())) {
+      setCouponError("You have already used this coupon once on this device.");
+      return;
+    }
+
+    setValidatingCoupon(true);
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: couponCode.trim(),
+          machineId,
+          customerEmail: email || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.valid) {
+        throw new Error(data.error || "Invalid coupon.");
+      }
+
+      setAppliedCoupon({
+        code: data.code,
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+      });
+      setCouponError(null);
+    } catch (err) {
+      setCouponError(err instanceof Error ? err.message : "Failed to apply coupon.");
+      setAppliedCoupon(null);
+    }
+    setValidatingCoupon(false);
+  }
+
+  function handleRemoveCoupon() {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    setCouponError(null);
+  }
+
   function getPlaceholder() {
     const p = service.platform.toLowerCase().replace(/[^a-z]/g, "");
     const lbl = serviceType.label.toLowerCase();
 
-    // Post / Video / Track links
     if (
       lbl.includes("post like") ||
       lbl.includes("video") ||
@@ -64,17 +141,14 @@ export function OrderForm() {
       return `https://${p}.com/username/status/123...`;
     }
 
-    // Playlists
     if (lbl.includes("playlist")) return "https://open.spotify.com/playlist/123...";
 
-    // Channels / Groups
     if (lbl.includes("subscriber") || lbl.includes("member")) {
       if (p === "youtube") return "https://youtube.com/channel/UC...";
       if (p === "telegram") return "https://t.me/yourchannel";
       return `https://${p}.com/c/yourchannel`;
     }
 
-    // Profiles / Pages
     if (p === "spotify") return "https://open.spotify.com/artist/123...";
     if (p === "telegram") return "https://t.me/yourusername";
     if (p === "youtube") return "https://youtube.com/@yourchannel";
@@ -102,10 +176,20 @@ export function OrderForm() {
           paymentMethod: "paystack",
           customerEmail: email || undefined,
           whatsappOptIn,
+          couponCode: appliedCoupon?.code,
+          discountAmount: discountAmount > 0 ? Number(discountAmount.toFixed(2)) : undefined,
+          machineId,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
+
+      // Record coupon used locally to prevent re-entry
+      if (appliedCoupon) {
+        const used: string[] = JSON.parse(localStorage.getItem("pulse_used_coupons") || "[]");
+        used.push(appliedCoupon.code);
+        localStorage.setItem("pulse_used_coupons", JSON.stringify(used));
+      }
 
       // If Paystack URL is returned, redirect to payment
       if (data.paymentUrl) {
@@ -232,11 +316,65 @@ export function OrderForm() {
               <span className="text-ink-soft">Rate per 1k</span>
               <span className="font-data font-medium">₵{serviceType.ratePer1k.toFixed(2)}</span>
             </div>
+            {appliedCoupon && (
+              <div className="flex justify-between text-signal">
+                <span className="flex items-center gap-1 font-medium">
+                  <Tag className="h-3.5 w-3.5" /> Code: {appliedCoupon.code}
+                </span>
+                <span className="font-data font-semibold">-₵{discountAmount.toFixed(2)}</span>
+              </div>
+            )}
           </div>
+
+          {/* Coupon Code Section */}
+          <div className="mt-4 border-t border-dashed border-line pt-4">
+            {!appliedCoupon ? (
+              <div>
+                <label className="text-xs font-medium text-ink-faint">Have a coupon code?</label>
+                <div className="mt-1.5 flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Enter code"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    className="w-full rounded-xl border border-line bg-canvas px-3 py-2 text-xs uppercase font-data font-semibold placeholder:normal-case outline-none"
+                  />
+                  <button
+                    onClick={handleApplyCoupon}
+                    disabled={validatingCoupon || !couponCode.trim()}
+                    className="rounded-xl bg-ink px-4 py-2 text-xs font-semibold text-canvas transition-opacity hover:opacity-90 disabled:opacity-50"
+                  >
+                    {validatingCoupon ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Apply"}
+                  </button>
+                </div>
+                {couponError && <p className="mt-1.5 text-xs text-danger">{couponError}</p>}
+              </div>
+            ) : (
+              <div className="flex items-center justify-between rounded-xl bg-signal-soft p-3 text-xs font-semibold text-signal">
+                <div className="flex items-center gap-1.5">
+                  <Check className="h-4 w-4" />
+                  <span>Coupon {appliedCoupon.code} applied!</span>
+                </div>
+                <button
+                  onClick={handleRemoveCoupon}
+                  className="rounded p-1 text-ink-soft hover:bg-canvas hover:text-ink"
+                  title="Remove coupon"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
+          </div>
+
           <div className="my-5 border-t border-dashed border-line" />
           <div className="flex items-end justify-between">
             <span className="font-medium">Total</span>
-            <span className="font-data text-2xl font-semibold">₵{total.toFixed(2)}</span>
+            <div className="text-right">
+              {discountAmount > 0 && (
+                <span className="block font-data text-xs text-ink-faint line-through">₵{subtotal.toFixed(2)}</span>
+              )}
+              <span className="font-data text-2xl font-semibold">₵{total.toFixed(2)}</span>
+            </div>
           </div>
           <p className="text-xs text-ink-faint">Includes all applicable fees</p>
 
@@ -264,7 +402,7 @@ export function OrderForm() {
             <span className="flex items-center gap-1"><Zap className="h-3.5 w-3.5" /> Instant start</span>
           </div>
         </div>
-        
+
         {/* Bulk & Custom notice */}
         <div className="mt-4 rounded-xl border border-dashed border-line bg-canvas-raised p-4 text-center text-sm text-ink-soft">
           <p>
@@ -284,3 +422,4 @@ export function OrderForm() {
     </div>
   );
 }
+

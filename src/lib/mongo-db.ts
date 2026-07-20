@@ -23,10 +23,15 @@ function fromDoc(doc: Record<string, unknown>): Order {
     customerPhone: (doc.customerPhone as string) || null,
     whatsappOptIn: Boolean(doc.whatsappOptIn),
     note: (doc.note as string) || null,
+    couponCode: (doc.couponCode as string) || null,
+    discountAmount: doc.discountAmount !== undefined && doc.discountAmount !== null ? Number(doc.discountAmount) : null,
+    isResellerOrder: Boolean(doc.isResellerOrder),
+    resellerEmail: (doc.resellerEmail as string) || null,
     createdAt: doc.createdAt as string,
     updatedAt: doc.updatedAt as string,
   };
 }
+
 
 export async function mongoListOrders(): Promise<Order[]> {
   const db = await getDb();
@@ -73,10 +78,15 @@ export async function mongoCreateOrder(input: NewOrderInput): Promise<Order | nu
     customerEmail: input.customerEmail || null,
     customerPhone: input.customerPhone || null,
     whatsappOptIn: input.whatsappOptIn || false,
+    couponCode: input.couponCode || null,
+    discountAmount: input.discountAmount || null,
+    isResellerOrder: Boolean(input.isResellerOrder),
+    resellerEmail: input.resellerEmail || null,
     note: null,
     createdAt: now,
     updatedAt: now,
   };
+
 
   await db.collection(COLLECTION).insertOne({ ...order });
   return order;

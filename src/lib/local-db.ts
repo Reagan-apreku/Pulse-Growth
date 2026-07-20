@@ -66,10 +66,15 @@ export function localCreateOrder(input: NewOrderInput): Order {
     customerEmail: input.customerEmail || null,
     customerPhone: input.customerPhone || null,
     whatsappOptIn: input.whatsappOptIn || false,
+    couponCode: input.couponCode || null,
+    discountAmount: input.discountAmount || null,
+    isResellerOrder: Boolean(input.isResellerOrder),
+    resellerEmail: input.resellerEmail || null,
     note: null,
     createdAt: now,
     updatedAt: now,
   };
+
   orders.unshift(order);
   persist(orders);
   return order;

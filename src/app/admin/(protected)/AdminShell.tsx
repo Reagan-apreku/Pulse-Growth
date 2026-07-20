@@ -3,13 +3,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, ListOrdered, LogOut, Zap } from "lucide-react";
+import { LayoutGrid, ListOrdered, Tag, Users, LogOut, Zap } from "lucide-react";
 import { clsx } from "clsx";
 
 const NAV = [
   { href: "/admin", label: "Overview", icon: LayoutGrid },
   { href: "/admin/orders", label: "Orders", icon: ListOrdered },
+  { href: "/admin/coupons", label: "Coupons", icon: Tag },
+  { href: "/admin/resellers", label: "Resellers", icon: Users },
 ];
+
 
 export function AdminShell({ children, email }: { children: React.ReactNode; email: string }) {
   const pathname = usePathname();

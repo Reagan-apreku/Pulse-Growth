@@ -50,12 +50,29 @@ export async function POST(req: NextRequest) {
     customerEmail: body.customerEmail,
     customerPhone: body.customerPhone,
     whatsappOptIn: Boolean(body.whatsappOptIn),
+    couponCode: body.couponCode,
+    discountAmount: body.discountAmount ? Number(body.discountAmount) : undefined,
+    isResellerOrder: Boolean(body.isResellerOrder),
+    resellerEmail: body.resellerEmail,
   };
 
   const order = await createOrder(input);
   if (!order) {
     return NextResponse.json({ error: "Could not create order." }, { status: 500 });
   }
+
+  // Record coupon usage if applied
+  if (body.couponCode && body.machineId) {
+    const { recordCouponUsage } = await import("@/lib/coupons");
+    await recordCouponUsage(body.couponCode, body.machineId, body.customerEmail || null, order.id).catch(() => {});
+  }
+
+  // Record reseller order stats if reseller
+  if (body.isResellerOrder && body.resellerEmail) {
+    const { recordResellerOrder } = await import("@/lib/resellers");
+    await recordResellerOrder(body.resellerEmail, order.total).catch(() => {});
+  }
+
 
   // If Paystack is configured, initialize a transaction
   const paystackSecret = process.env.PAYSTACK_SECRET_KEY;

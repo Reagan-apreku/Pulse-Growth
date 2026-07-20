@@ -26,9 +26,11 @@ export function Footer() {
               <Link href="/legal/refunds" className="text-ink-soft hover:text-ink">Refunds</Link>
             </div>
             <div className="flex flex-col gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wide text-ink-faint">Payments</span>
+              <span className="text-xs font-semibold uppercase tracking-wide text-ink-faint">Program</span>
+              <Link href="/reseller" className="font-semibold text-accent hover:underline">Become a Reseller</Link>
               <Link href="/legal/momo-guide" className="text-ink-soft hover:text-ink">MoMo Guide</Link>
             </div>
+
           </div>
         </div>
         <p className="mt-8 text-xs text-ink-faint">© {new Date().getFullYear()} Pulse Growth Labs, West Africa. All rights reserved.</p>

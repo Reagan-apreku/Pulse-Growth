@@ -26,6 +26,10 @@ export interface Order {
   customerPhone: string | null;
   whatsappOptIn: boolean;
   note: string | null;
+  couponCode?: string | null;
+  discountAmount?: number | null;
+  isResellerOrder?: boolean;
+  resellerEmail?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,6 +45,10 @@ export interface NewOrderInput {
   customerEmail?: string;
   customerPhone?: string;
   whatsappOptIn?: boolean;
+  couponCode?: string;
+  discountAmount?: number;
+  isResellerOrder?: boolean;
+  resellerEmail?: string;
 }
 
 export interface Service {
@@ -51,3 +59,41 @@ export interface Service {
   startingPrice: number;
   serviceTypes: { label: string; ratePer1k: number; minOrder?: number }[];
 }
+
+export type DiscountType = "percentage" | "fixed";
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discountType: DiscountType;
+  discountValue: number;
+  maxUses: number | null;
+  usedCount: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CouponUsage {
+  id: string;
+  couponCode: string;
+  customerEmail: string | null;
+  machineId: string;
+  orderId: string;
+  usedAt: string;
+}
+
+export interface ResellerAccount {
+  id: string;
+  name: string;
+  email: string;
+  businessName: string | null;
+  phone: string | null;
+  status: "active" | "inactive";
+  discountPercentage: number; // default 10
+  totalOrders: number;
+  totalSpent: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
