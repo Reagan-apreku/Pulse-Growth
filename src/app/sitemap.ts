@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || "https://pulse.dev";
+  const base = process.env.NEXT_PUBLIC_BASE_URL || "https://www.pulsegh.com";
+
 
   return [
     {

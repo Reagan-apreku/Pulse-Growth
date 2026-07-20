@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-const defaultUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://pulse.dev";
+const defaultUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.pulsegh.com";
+
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
