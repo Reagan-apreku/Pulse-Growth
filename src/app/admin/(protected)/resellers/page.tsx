@@ -5,7 +5,17 @@ import { Users, Power, AlertCircle, Check, DollarSign, ShoppingBag } from "lucid
 import { clsx } from "clsx";
 import { ResellerAccount } from "@/lib/types";
 
+function formatWhatsAppPhone(phone: string): string {
+  let cleaned = (phone || "").replace(/[^0-9]/g, "");
+  // If local Ghana number starting with 0, convert to 233
+  if (cleaned.startsWith("0")) {
+    cleaned = "233" + cleaned.substring(1);
+  }
+  return cleaned;
+}
+
 export default function AdminResellersPage() {
+
   const [resellers, setResellers] = useState<ResellerAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -186,8 +196,8 @@ export default function AdminResellersPage() {
                         <div className="flex items-center justify-end gap-2">
                           {r.status === "active" && (
                             <a
-                              href={`https://wa.me/${(r.phone || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                                `Hi ${r.name}, your Pulse Wholesale Reseller account has been APPROVED! 🎉 You can now log in at ${process.env.NEXT_PUBLIC_BASE_URL || "https://pulsegh.com"}/reseller to enjoy 10% wholesale rates on all orders.`
+                              href={`https://api.whatsapp.com/send?phone=${formatWhatsAppPhone(r.phone || "")}&text=${encodeURIComponent(
+                                `Hi ${r.name}, your Pulse Wholesale Reseller account has been APPROVED! 🎉 You can now log in at https://pulsegh.com/reseller to enjoy 10% wholesale rates on all orders.`
                               )}`}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -196,6 +206,7 @@ export default function AdminResellersPage() {
                             >
                               WhatsApp Notify
                             </a>
+
                           )}
                           <button
                             onClick={() => setResellerStatus(r.id, r.status === "active" ? "inactive" : "active")}
