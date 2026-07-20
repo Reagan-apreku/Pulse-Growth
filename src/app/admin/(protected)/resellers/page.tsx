@@ -183,20 +183,36 @@ export default function AdminResellersPage() {
                           </button>
                         </div>
                       ) : (
-                        <button
-                          onClick={() => setResellerStatus(r.id, r.status === "active" ? "inactive" : "active")}
-                          className={clsx(
-                            "inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors",
-                            r.status === "active"
-                              ? "bg-canvas text-ink-soft hover:bg-warn-soft hover:text-warn"
-                              : "bg-signal-soft text-signal hover:opacity-80"
+                        <div className="flex items-center justify-end gap-2">
+                          {r.status === "active" && (
+                            <a
+                              href={`https://wa.me/${(r.phone || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+                                `Hi ${r.name}, your Pulse Wholesale Reseller account has been APPROVED! 🎉 You can now log in at ${process.env.NEXT_PUBLIC_BASE_URL || "https://pulsegh.com"}/reseller to enjoy 10% wholesale rates on all orders.`
+                              )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 rounded-lg bg-signal-soft px-2.5 py-1 text-xs font-semibold text-signal hover:opacity-90"
+                              title="Send WhatsApp Approval Message"
+                            >
+                              WhatsApp Notify
+                            </a>
                           )}
-                        >
-                          <Power className="h-3.5 w-3.5" />
-                          {r.status === "active" ? "Deactivate" : "Activate"}
-                        </button>
+                          <button
+                            onClick={() => setResellerStatus(r.id, r.status === "active" ? "inactive" : "active")}
+                            className={clsx(
+                              "inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors",
+                              r.status === "active"
+                                ? "bg-canvas text-ink-soft hover:bg-warn-soft hover:text-warn"
+                                : "bg-signal-soft text-signal hover:opacity-80"
+                            )}
+                          >
+                            <Power className="h-3.5 w-3.5" />
+                            {r.status === "active" ? "Deactivate" : "Activate"}
+                          </button>
+                        </div>
                       )}
                     </td>
+
                   </tr>
                 ))}
               </tbody>
