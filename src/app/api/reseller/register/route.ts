@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { registerReseller } from "@/lib/resellers";
 import { notifyAdminNewReseller } from "@/lib/telegram-notify";
+import { sendAdminResellerAlert } from "@/lib/mail";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -18,6 +19,11 @@ export async function POST(req: NextRequest) {
     password: body.password,
     phone: body.phone,
     businessName: body.businessName,
+  });
+
+  // Send Email notification to admin
+  await sendAdminResellerAlert(reseller).catch((err) => {
+    console.error("Failed to send email reseller alert:", err);
   });
 
   // Send Telegram notification to admin for approval

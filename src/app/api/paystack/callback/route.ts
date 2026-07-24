@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyTransaction } from "@/lib/paystack";
 import { getOrderByPaystackRef, updateOrder, getOrder } from "@/lib/store";
 import { notifyAdminTelegram } from "@/lib/telegram-notify";
+import { sendAdminOrderAlert, sendCustomerReceipt } from "@/lib/mail";
 
 /**
  * Paystack callback redirect.
@@ -39,7 +40,14 @@ export async function GET(req: NextRequest) {
             paymentStatus: "paid",
             status: order.status === "pending" ? "processing" : order.status,
           });
-          if (updated) notifyAdminTelegram(updated).catch(console.error);
+          if (updated) {
+            // Send email receipts and alerts
+            sendAdminOrderAlert(updated).catch(console.error);
+            sendCustomerReceipt(updated).catch(console.error);
+            
+            // Notify admin via Telegram
+            notifyAdminTelegram(updated).catch(console.error);
+          }
         }
         return NextResponse.redirect(`${baseUrl}/track?id=${encodeURIComponent(orderId)}&paid=1`);
       } else {

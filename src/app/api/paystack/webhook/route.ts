@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isValidWebhookSignature } from "@/lib/paystack";
 import { getOrderByPaystackRef, updateOrder, getOrder } from "@/lib/store";
 import { notifyAdminTelegram } from "@/lib/telegram-notify";
+import { sendAdminOrderAlert, sendCustomerReceipt } from "@/lib/mail";
 
 /**
  * Paystack webhook endpoint.
@@ -40,8 +41,12 @@ export async function POST(req: NextRequest) {
         status: order.status === "pending" ? "processing" : order.status,
       });
 
-      // Notify admin via Telegram
       if (updated) {
+        // Send email receipts and alerts
+        sendAdminOrderAlert(updated).catch(console.error);
+        sendCustomerReceipt(updated).catch(console.error);
+        
+        // Notify admin via Telegram
         notifyAdminTelegram(updated).catch(console.error);
       }
     }
