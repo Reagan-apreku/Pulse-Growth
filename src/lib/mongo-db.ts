@@ -11,6 +11,7 @@ function fromDoc(doc: Record<string, unknown>): Order {
     platform: doc.platform as string,
     serviceName: doc.serviceName as string,
     quantity: doc.quantity as number,
+    username: doc.username as string || "Unknown",
     targetUrl: doc.targetUrl as string,
     ratePer1k: Number(doc.ratePer1k),
     total: Number(doc.total),
@@ -19,8 +20,8 @@ function fromDoc(doc: Record<string, unknown>): Order {
     paystackReference: (doc.paystackReference as string) || null,
     status: doc.status as Order["status"],
     deliveredCount: (doc.deliveredCount as number) || 0,
-    customerEmail: (doc.customerEmail as string) || null,
-    customerPhone: (doc.customerPhone as string) || null,
+    customerEmail: (doc.customerEmail as string) || "",
+    customerPhone: (doc.customerPhone as string) || "",
     whatsappOptIn: Boolean(doc.whatsappOptIn),
     note: (doc.note as string) || null,
     couponCode: (doc.couponCode as string) || null,
@@ -31,7 +32,6 @@ function fromDoc(doc: Record<string, unknown>): Order {
     updatedAt: doc.updatedAt as string,
   };
 }
-
 
 export async function mongoListOrders(): Promise<Order[]> {
   const db = await getDb();
@@ -67,6 +67,7 @@ export async function mongoCreateOrder(input: NewOrderInput): Promise<Order | nu
     platform: input.platform,
     serviceName: input.serviceName,
     quantity: input.quantity,
+    username: input.username,
     targetUrl: input.targetUrl,
     ratePer1k: input.ratePer1k,
     total: input.total,
@@ -75,8 +76,8 @@ export async function mongoCreateOrder(input: NewOrderInput): Promise<Order | nu
     paystackReference: null,
     status: "pending",
     deliveredCount: 0,
-    customerEmail: input.customerEmail || null,
-    customerPhone: input.customerPhone || null,
+    customerEmail: input.customerEmail,
+    customerPhone: input.customerPhone,
     whatsappOptIn: input.whatsappOptIn || false,
     couponCode: input.couponCode || null,
     discountAmount: input.discountAmount || null,

@@ -19,8 +19,10 @@ export function OrderForm() {
   const serviceType = service.serviceTypes[serviceTypeIndex] || service.serviceTypes[0];
 
   const [quantity, setQuantity] = useState(1000);
+  const [username, setUsername] = useState("");
   const [targetUrl, setTargetUrl] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -157,10 +159,23 @@ export function OrderForm() {
 
   async function handleSubmit() {
     setError(null);
-    if (!targetUrl.trim()) {
-      setError("Add your profile link or username first.");
+    if (!username.trim()) {
+      setError("Please provide your username.");
       return;
     }
+    if (!targetUrl.trim()) {
+      setError("Please provide the target URL or link.");
+      return;
+    }
+    if (!email.trim() || !email.includes("@")) {
+      setError("Please provide a valid email address.");
+      return;
+    }
+    if (!phone.trim()) {
+      setError("Please provide your phone number.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const res = await fetch("/api/orders", {
@@ -170,11 +185,13 @@ export function OrderForm() {
           platform: service.platform,
           serviceName: `${service.platform} ${serviceType.label}`,
           quantity,
-          targetUrl,
+          username: username.trim(),
+          targetUrl: targetUrl.trim(),
           ratePer1k: serviceType.ratePer1k,
           total: Number(total.toFixed(2)),
           paymentMethod: "paystack",
-          customerEmail: email || undefined,
+          customerEmail: email.trim(),
+          customerPhone: phone.trim(),
           whatsappOptIn,
           couponCode: appliedCoupon?.code,
           discountAmount: discountAmount > 0 ? Number(discountAmount.toFixed(2)) : undefined,
@@ -253,7 +270,19 @@ export function OrderForm() {
             ))}
           </select>
 
-          <label className="mt-4 block text-xs font-medium text-ink-faint">Target URL / Username</label>
+          <label className="mt-4 block text-xs font-medium text-ink-faint">
+            Target Username <span className="text-danger">*</span>
+          </label>
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="@yourusername"
+            className="mt-1.5 w-full rounded-xl border border-line bg-canvas-raised px-4 py-2.5 text-sm placeholder:text-ink-faint"
+          />
+
+          <label className="mt-4 block text-xs font-medium text-ink-faint">
+            Target URL / Link <span className="text-danger">*</span>
+          </label>
           <input
             value={targetUrl}
             onChange={(e) => setTargetUrl(e.target.value)}
@@ -279,11 +308,25 @@ export function OrderForm() {
             <span>10,000 max</span>
           </div>
 
-          <label className="mt-4 block text-xs font-medium text-ink-faint">Email for payment receipt & updates</label>
+          <label className="mt-4 block text-xs font-medium text-ink-faint">
+            Email for payment receipt & updates <span className="text-danger">*</span>
+          </label>
           <input
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
+            className="mt-1.5 w-full rounded-xl border border-line bg-canvas-raised px-4 py-2.5 text-sm placeholder:text-ink-faint"
+          />
+
+          <label className="mt-4 block text-xs font-medium text-ink-faint">
+            WhatsApp / Phone Number <span className="text-danger">*</span>
+          </label>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+233 55 123 4567"
             className="mt-1.5 w-full rounded-xl border border-line bg-canvas-raised px-4 py-2.5 text-sm placeholder:text-ink-faint"
           />
 

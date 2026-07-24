@@ -77,6 +77,10 @@ export async function sendCustomerReceipt(order: Order) {
             <td style="padding: 12px 0; text-align: right; color: #111;">${order.quantity.toLocaleString()}</td>
           </tr>
           <tr style="border-bottom: 1px solid #eaeaea;">
+            <td style="padding: 12px 0; color: #444; font-weight: 500;">Target Username</td>
+            <td style="padding: 12px 0; text-align: right; color: #111; word-break: break-all;">${order.username}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eaeaea;">
             <td style="padding: 12px 0; color: #444; font-weight: 500;">Target URL</td>
             <td style="padding: 12px 0; text-align: right; color: #111; word-break: break-all;">${order.targetUrl}</td>
           </tr>
@@ -116,8 +120,9 @@ export async function sendAdminOrderAlert(order: Order) {
         <li><strong>Amount:</strong> ₵${order.total.toFixed(2)}</li>
         <li><strong>Service:</strong> ${order.platform} - ${order.serviceName}</li>
         <li><strong>Quantity:</strong> ${order.quantity.toLocaleString()}</li>
-        <li><strong>Target:</strong> <a href="${order.targetUrl}">${order.targetUrl}</a></li>
-        <li><strong>Customer:</strong> ${order.customerEmail || "N/A"} ${order.customerPhone ? "(" + order.customerPhone + ")" : ""}</li>
+        <li><strong>Username:</strong> ${order.username}</li>
+        <li><strong>Target URL:</strong> <a href="${order.targetUrl}">${order.targetUrl}</a></li>
+        <li><strong>Customer:</strong> ${order.customerEmail} (${order.customerPhone})</li>
         <li><strong>Reseller Order:</strong> ${order.isResellerOrder ? 'Yes' : 'No'}</li>
       </ul>
       <p style="margin-top: 20px;">

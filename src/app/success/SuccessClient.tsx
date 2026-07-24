@@ -69,6 +69,10 @@ export function SuccessClient() {
               <dd className="font-data font-semibold text-signal">₵{order.total.toFixed(2)}</dd>
             </div>
             <div className="sm:col-span-2">
+              <dt className="text-ink-faint mb-1">Target Username</dt>
+              <dd className="font-medium text-ink break-all bg-canvas-raised p-2 rounded border border-line/50 mt-1">{order.username}</dd>
+            </div>
+            <div className="sm:col-span-2">
               <dt className="text-ink-faint mb-1">Target URL</dt>
               <dd className="font-medium text-ink break-all bg-canvas-raised p-2 rounded border border-line/50 mt-1">{order.targetUrl}</dd>
             </div>

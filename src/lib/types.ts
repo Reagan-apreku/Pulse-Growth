@@ -14,6 +14,7 @@ export interface Order {
   platform: string;
   serviceName: string;
   quantity: number;
+  username: string;
   targetUrl: string;
   ratePer1k: number;
   total: number;
@@ -22,8 +23,8 @@ export interface Order {
   paystackReference: string | null;
   status: OrderStatus;
   deliveredCount: number;
-  customerEmail: string | null;
-  customerPhone: string | null;
+  customerEmail: string;
+  customerPhone: string;
   whatsappOptIn: boolean;
   note: string | null;
   couponCode?: string | null;
@@ -38,12 +39,13 @@ export interface NewOrderInput {
   platform: string;
   serviceName: string;
   quantity: number;
+  username: string;
   targetUrl: string;
   ratePer1k: number;
   total: number;
   paymentMethod: PaymentMethod;
-  customerEmail?: string;
-  customerPhone?: string;
+  customerEmail: string;
+  customerPhone: string;
   whatsappOptIn?: boolean;
   couponCode?: string;
   discountAmount?: number;

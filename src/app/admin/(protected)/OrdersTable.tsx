@@ -161,22 +161,27 @@ export function OrdersTable({ limit, showControls = true }: { limit?: number; sh
                   <td className="py-3 pr-4 font-data text-xs font-medium">{order.id}</td>
                   <td className="py-3 pr-4">{order.serviceName}</td>
                   <td className="py-3 pr-4">
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(order.targetUrl);
-                        setCopiedId(order.id);
-                        setTimeout(() => setCopiedId(null), 2000);
-                      }}
-                      title="Click to copy"
-                      className="group flex max-w-[200px] items-center gap-1.5 rounded-lg border border-transparent px-2 py-1 font-data text-xs text-ink-soft transition-colors hover:border-line hover:bg-canvas"
-                    >
-                      <span className="truncate">{order.targetUrl}</span>
-                      {copiedId === order.id ? (
-                        <Check className="h-3 w-3 shrink-0 text-signal" />
-                      ) : (
-                        <Copy className="h-3 w-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
-                      )}
-                    </button>
+                    <div className="flex flex-col gap-1">
+                      <span className="font-medium text-ink max-w-[200px] truncate" title={order.username}>
+                        {order.username}
+                      </span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(order.targetUrl);
+                          setCopiedId(order.id);
+                          setTimeout(() => setCopiedId(null), 2000);
+                        }}
+                        title="Click to copy URL"
+                        className="group flex max-w-[200px] items-center gap-1.5 rounded-lg border border-transparent px-2 py-1 font-data text-xs text-ink-soft transition-colors hover:border-line hover:bg-canvas"
+                      >
+                        <span className="truncate">{order.targetUrl}</span>
+                        {copiedId === order.id ? (
+                          <Check className="h-3 w-3 shrink-0 text-signal" />
+                        ) : (
+                          <Copy className="h-3 w-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
+                        )}
+                      </button>
+                    </div>
                   </td>
                   <td className="py-3 pr-4 font-data font-medium">₵{order.total.toFixed(2)}</td>
                   <td className="py-3 pr-4">

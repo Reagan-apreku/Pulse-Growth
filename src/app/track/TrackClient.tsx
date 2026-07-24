@@ -168,8 +168,12 @@ export function TrackClient() {
                 <dd className="font-data font-medium">{order.quantity.toLocaleString()}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-ink-soft">Target</dt>
-                <dd className="font-data font-medium">{order.targetUrl}</dd>
+                <dt className="text-ink-soft">Target Username</dt>
+                <dd className="font-data font-medium">{order.username}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-ink-soft">Target URL</dt>
+                <dd className="font-data font-medium break-all text-right ml-4 max-w-[200px]">{order.targetUrl}</dd>
               </div>
               <div className="flex justify-between border-t border-dashed border-line pt-3">
                 <dt className="text-ink-soft">Payment</dt>

@@ -48,8 +48,10 @@ export default function ResellerPortalPage() {
   const serviceType = service.serviceTypes[serviceTypeIndex] || service.serviceTypes[0];
 
   const [quantity, setQuantity] = useState(1000);
+  const [username, setUsername] = useState("");
   const [targetUrl, setTargetUrl] = useState("");
   const [clientEmail, setClientEmail] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
 
   // Client markup calculator state
@@ -162,10 +164,23 @@ export default function ResellerPortalPage() {
 
   async function handlePlaceWholesaleOrder() {
     setOrderError(null);
-    if (!targetUrl.trim()) {
-      setOrderError("Enter the client's profile link or username first.");
+    if (!username.trim()) {
+      setOrderError("Enter the client's username.");
       return;
     }
+    if (!targetUrl.trim()) {
+      setOrderError("Enter the client's profile link or URL.");
+      return;
+    }
+    if (!clientEmail.trim() && !reseller?.email) {
+      setOrderError("Email is required.");
+      return;
+    }
+    if (!clientPhone.trim() && !reseller?.phone) {
+      setOrderError("Phone number is required.");
+      return;
+    }
+
     setOrderSubmitting(true);
     try {
       const res = await fetch("/api/orders", {
@@ -175,11 +190,13 @@ export default function ResellerPortalPage() {
           platform: service.platform,
           serviceName: `${service.platform} ${serviceType.label}`,
           quantity,
-          targetUrl,
+          username: username.trim(),
+          targetUrl: targetUrl.trim(),
           ratePer1k: Number(resellerRate.toFixed(2)),
           total: Number(resellerSubtotal.toFixed(2)),
           paymentMethod: "paystack",
           customerEmail: clientEmail.trim() || reseller?.email,
+          customerPhone: clientPhone.trim() || reseller?.phone,
           whatsappOptIn,
           isResellerOrder: true,
           resellerEmail: reseller?.email,
@@ -513,7 +530,17 @@ export default function ResellerPortalPage() {
                   </select>
 
                   <label className="mt-4 block text-xs font-medium text-ink-faint">
-                    Client's Target Profile / Post URL
+                    Client's Target Username <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="@clientusername"
+                    className="mt-1.5 w-full rounded-xl border border-line bg-canvas-raised px-4 py-2.5 text-sm placeholder:text-ink-faint"
+                  />
+
+                  <label className="mt-4 block text-xs font-medium text-ink-faint">
+                    Client's Target Profile / Post URL <span className="text-danger">*</span>
                   </label>
                   <input
                     value={targetUrl}
@@ -537,12 +564,24 @@ export default function ResellerPortalPage() {
                   />
 
                   <label className="mt-4 block text-xs font-medium text-ink-faint">
-                    Client Email (Optional for tracking updates)
+                    Client Email (Or your email) <span className="text-danger">*</span>
                   </label>
                   <input
+                    type="email"
                     value={clientEmail}
                     onChange={(e) => setClientEmail(e.target.value)}
                     placeholder="client@example.com"
+                    className="mt-1.5 w-full rounded-xl border border-line bg-canvas-raised px-4 py-2.5 text-sm placeholder:text-ink-faint"
+                  />
+
+                  <label className="mt-4 block text-xs font-medium text-ink-faint">
+                    Client Phone (Or your phone) <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={clientPhone}
+                    onChange={(e) => setClientPhone(e.target.value)}
+                    placeholder="+233 55 123 4567"
                     className="mt-1.5 w-full rounded-xl border border-line bg-canvas-raised px-4 py-2.5 text-sm placeholder:text-ink-faint"
                   />
                 </div>

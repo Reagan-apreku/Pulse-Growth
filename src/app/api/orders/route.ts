@@ -33,16 +33,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const { platform, serviceName, quantity, targetUrl, ratePer1k, total } = body;
+  const { platform, serviceName, quantity, username, targetUrl, ratePer1k, total } = body;
 
-  if (!platform || !serviceName || !quantity || !targetUrl || !ratePer1k || !total) {
+  if (!platform || !serviceName || !quantity || !username || !targetUrl || !ratePer1k || !total) {
     return NextResponse.json({ error: "Missing required order fields." }, { status: 400 });
+  }
+  
+  if (!body.customerEmail || !body.customerPhone) {
+    return NextResponse.json({ error: "Email and Phone Number are required." }, { status: 400 });
   }
 
   const input: NewOrderInput = {
     platform,
     serviceName,
     quantity: Number(quantity),
+    username,
     targetUrl,
     ratePer1k: Number(ratePer1k),
     total: Number(total),

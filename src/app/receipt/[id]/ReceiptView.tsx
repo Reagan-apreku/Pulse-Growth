@@ -86,8 +86,12 @@ export function ReceiptView({ order }: { order: Order }) {
             <span className="font-medium">{order.platform}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-ink-soft">Target</span>
-            <span className="font-data font-medium">{order.targetUrl}</span>
+            <span className="text-ink-soft">Target Username</span>
+            <span className="font-data font-medium text-right">{order.username}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-ink-soft">Target URL</span>
+            <span className="font-data font-medium text-right break-all ml-4 max-w-[200px]">{order.targetUrl}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-ink-soft">Quantity</span>

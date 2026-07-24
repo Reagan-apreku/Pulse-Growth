@@ -24,6 +24,7 @@ export async function notifyAdminTelegram(order: Order): Promise<void> {
     `🛎️ Service: ${order.serviceName}`,
     `📊 Qty: ${order.quantity.toLocaleString()}`,
     `💵 Total: ₵${order.total.toFixed(2)}`,
+    `👤 Username: ${order.username}`,
     `🎯 Target: ${order.targetUrl}`,
     order.customerEmail ? `📧 Email: ${order.customerEmail}` : "",
     ``,
