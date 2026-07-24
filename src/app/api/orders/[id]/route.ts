@@ -53,5 +53,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!updated) {
     return NextResponse.json({ error: "Order not found." }, { status: 404 });
   }
+
+  // Trigger completion email if the status was just changed to completed
+  if (body.status === "completed") {
+    const { sendOrderCompleteEmail } = await import("@/lib/mail");
+    sendOrderCompleteEmail(updated).catch(console.error);
+  }
+
   return NextResponse.json({ order: updated });
 }

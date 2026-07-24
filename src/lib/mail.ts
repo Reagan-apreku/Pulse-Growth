@@ -160,3 +160,56 @@ export async function sendAdminResellerAlert(reseller: ResellerAccount) {
 
   return sendMail(ADMIN_EMAIL, subject, html);
 }
+
+/** Sends an email to the customer when their order is marked as completed. */
+export async function sendOrderCompleteEmail(order: Order) {
+  if (!order.customerEmail) return false;
+
+  const subject = `✅ Your Order is Complete! - ${order.id}`;
+  
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 12px;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h1 style="color: #2ecc71; font-size: 24px; margin: 0;">Order Completed! 🎉</h1>
+        <p style="color: #666; font-size: 16px; margin-top: 8px;">Great news! We have successfully completed your order.</p>
+      </div>
+      
+      <div style="background-color: #fff; padding: 24px; border-radius: 8px; border: 1px solid #eaeaea;">
+        <h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-top: 0;">Order Details</h2>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+          <tr style="border-bottom: 1px solid #eaeaea;">
+            <td style="padding: 12px 0; color: #444; font-weight: 500;">Order ID</td>
+            <td style="padding: 12px 0; text-align: right; color: #111; font-weight: 600;">${order.id}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eaeaea;">
+            <td style="padding: 12px 0; color: #444; font-weight: 500;">Service</td>
+            <td style="padding: 12px 0; text-align: right; color: #111;">${order.serviceName}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eaeaea;">
+            <td style="padding: 12px 0; color: #444; font-weight: 500;">Quantity Delivered</td>
+            <td style="padding: 12px 0; text-align: right; color: #111;">${order.quantity.toLocaleString()}</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px 0; color: #444; font-weight: 500;">Target Username</td>
+            <td style="padding: 12px 0; text-align: right; color: #111; word-break: break-all;">${order.username}</td>
+          </tr>
+        </table>
+        
+        <div style="text-align: center; margin-top: 32px;">
+          <a href="${BASE_URL}/track?id=${encodeURIComponent(order.id)}" style="display: inline-block; background-color: #111; color: #fff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+            View Tracking Details
+          </a>
+        </div>
+      </div>
+      
+      <p style="text-align: center; color: #888; font-size: 12px; margin-top: 24px;">
+        Thank you for choosing Pulse Growth for your social media needs!<br/>
+        If you have any questions, simply reply to this email.<br/>
+        &copy; ${new Date().getFullYear()} Pulse Social Growth.
+      </p>
+    </div>
+  `;
+
+  return sendMail(order.customerEmail, subject, html);
+}
