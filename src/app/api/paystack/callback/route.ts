@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
             notifyAdminTelegram(updated).catch(console.error);
           }
         }
-        return NextResponse.redirect(`${baseUrl}/track?id=${encodeURIComponent(orderId)}&paid=1`);
+        return NextResponse.redirect(`${baseUrl}/success?id=${encodeURIComponent(orderId)}`);
       } else {
         // Payment failed or was abandoned
         let order = await getOrder(orderId);
