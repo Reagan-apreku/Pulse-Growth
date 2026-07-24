@@ -36,12 +36,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const patch: { status?: OrderStatus; deliveredCount?: number; note?: string } = {};
+  const patch: { status?: OrderStatus; deliveredCount?: number; note?: string; paymentStatus?: "unpaid" | "paid" | "failed" } = {};
   if (body.status) {
     if (!VALID_STATUSES.includes(body.status)) {
       return NextResponse.json({ error: "Invalid status." }, { status: 400 });
     }
     patch.status = body.status;
+  }
+  if (body.paymentStatus && ["unpaid", "paid", "failed"].includes(body.paymentStatus)) {
+    patch.paymentStatus = body.paymentStatus as "unpaid" | "paid" | "failed";
   }
   if (typeof body.deliveredCount === "number") patch.deliveredCount = body.deliveredCount;
   if (typeof body.note === "string") patch.note = body.note;

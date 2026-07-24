@@ -23,7 +23,17 @@ export async function GET(req: NextRequest) {
     try {
       const txn = await verifyTransaction(reference);
       if (txn.data.status === "success") {
-        const order = await getOrderByPaystackRef(reference);
+        let order = await getOrderByPaystackRef(reference);
+        
+        // Fallback to orderId from metadata or URL
+        if (!order) {
+          const metadataOrderId = txn.data.metadata?.order_id as string | undefined;
+          const targetOrderId = metadataOrderId || orderId;
+          if (targetOrderId) {
+            order = await getOrder(targetOrderId);
+          }
+        }
+
         if (order && order.paymentStatus !== "paid") {
           const updated = await updateOrder(order.id, {
             paymentStatus: "paid",
@@ -34,7 +44,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.redirect(`${baseUrl}/track?id=${encodeURIComponent(orderId)}&paid=1`);
       } else {
         // Payment failed or was abandoned
-        const order = await getOrder(orderId);
+        let order = await getOrder(orderId);
         if (order && order.paymentStatus === "unpaid") {
           await updateOrder(order.id, { paymentStatus: "failed" });
         }

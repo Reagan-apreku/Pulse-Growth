@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidWebhookSignature } from "@/lib/paystack";
-import { getOrderByPaystackRef, updateOrder } from "@/lib/store";
+import { getOrderByPaystackRef, updateOrder, getOrder } from "@/lib/store";
 import { notifyAdminTelegram } from "@/lib/telegram-notify";
 
 /**
@@ -27,7 +27,12 @@ export async function POST(req: NextRequest) {
 
   if (event.event === "charge.success") {
     const reference = event.data.reference;
-    const order = await getOrderByPaystackRef(reference);
+    let order = await getOrderByPaystackRef(reference);
+
+    // Fallback: try to find by metadata.order_id
+    if (!order && (event.data as any).metadata?.order_id) {
+      order = await getOrder((event.data as any).metadata.order_id);
+    }
 
     if (order) {
       const updated = await updateOrder(order.id, {

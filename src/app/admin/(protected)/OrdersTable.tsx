@@ -62,6 +62,20 @@ export function OrdersTable({ limit, showControls = true }: { limit?: number; sh
     setUpdatingId(null);
   }
 
+  async function updatePaymentStatus(id: string, paymentStatus: PaymentStatus) {
+    setUpdatingId(id);
+    const res = await fetch(`/api/orders/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paymentStatus }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setOrders((prev) => prev.map((o) => (o.id === id ? data.order : o)));
+    }
+    setUpdatingId(null);
+  }
+
   async function updateDelivered(id: string) {
     const count = parseInt(deliveredValue, 10);
     if (isNaN(count) || count < 0) return;
@@ -166,13 +180,23 @@ export function OrdersTable({ limit, showControls = true }: { limit?: number; sh
                   </td>
                   <td className="py-3 pr-4 font-data font-medium">₵{order.total.toFixed(2)}</td>
                   <td className="py-3 pr-4">
-                    <span className={clsx(
-                      "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold capitalize",
-                      PAYMENT_STYLE[order.paymentStatus]
-                    )}>
-                      <CreditCard className="h-3 w-3" />
-                      {order.paymentStatus}
-                    </span>
+                    <div className="relative inline-block">
+                      <select
+                        value={order.paymentStatus}
+                        disabled={updatingId === order.id}
+                        onChange={(e) => updatePaymentStatus(order.id, e.target.value as PaymentStatus)}
+                        className={clsx(
+                          "appearance-none rounded-full py-1 pl-7 pr-7 text-xs font-semibold capitalize outline-none",
+                          PAYMENT_STYLE[order.paymentStatus]
+                        )}
+                      >
+                        <option value="unpaid">Unpaid</option>
+                        <option value="paid">Paid</option>
+                        <option value="failed">Failed</option>
+                      </select>
+                      <CreditCard className="pointer-events-none absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2" />
+                      <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2" />
+                    </div>
                   </td>
                   <td className="py-3 pr-4">
                     {editingDelivered === order.id ? (
