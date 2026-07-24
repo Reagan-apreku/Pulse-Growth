@@ -98,7 +98,7 @@ export async function sendCustomerReceipt(order: Order) {
       </div>
       
       <p style="text-align: center; color: #888; font-size: 12px; margin-top: 24px;">
-        If you have any questions, please reply to this email.<br/>
+        If you have any questions, please reply to this email or contact us at <a href="mailto:pulsegrowthgh@gmail.com" style="color: #111; font-weight: 500; text-decoration: none;">pulsegrowthgh@gmail.com</a>.<br/>
         &copy; ${new Date().getFullYear()} Pulse Social Growth.
       </p>
     </div>
@@ -205,7 +205,7 @@ export async function sendOrderCompleteEmail(order: Order) {
       
       <p style="text-align: center; color: #888; font-size: 12px; margin-top: 24px;">
         Thank you for choosing Pulse Growth for your social media needs!<br/>
-        If you have any questions, simply reply to this email.<br/>
+        If you have any questions, simply reply to this email or contact us at <a href="mailto:pulsegrowthgh@gmail.com" style="color: #111; font-weight: 500; text-decoration: none;">pulsegrowthgh@gmail.com</a>.<br/>
         &copy; ${new Date().getFullYear()} Pulse Social Growth.
       </p>
     </div>

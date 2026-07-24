@@ -30,6 +30,11 @@ export function Footer() {
               <Link href="/reseller" className="font-semibold text-accent hover:underline">Become a Reseller</Link>
               <Link href="/legal/momo-guide" className="text-ink-soft hover:text-ink">MoMo Guide</Link>
             </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-ink-faint">Contact</span>
+              <a href="mailto:pulsegrowthgh@gmail.com" className="text-ink-soft hover:text-ink">pulsegrowthgh@gmail.com</a>
+              <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "233551707942"}`} target="_blank" rel="noopener noreferrer" className="text-ink-soft hover:text-ink">WhatsApp Support</a>
+            </div>
 
           </div>
         </div>

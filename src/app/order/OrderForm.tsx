@@ -450,16 +450,24 @@ export function OrderForm() {
         <div className="mt-4 rounded-xl border border-dashed border-line bg-canvas-raised p-4 text-center text-sm text-ink-soft">
           <p>
             Need a <strong className="text-ink">different service</strong> or looking for <strong className="text-ink">bulk pricing</strong>?
-            <br />
+          </p>
+          <div className="mt-2 flex flex-col gap-1 items-center justify-center">
             <a 
               href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "233551707942"}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="mt-1 inline-block font-medium text-accent hover:underline"
+              className="font-medium text-accent hover:underline"
             >
               Contact support on WhatsApp
             </a>
-          </p>
+            <span className="text-xs text-ink-faint">or</span>
+            <a 
+              href="mailto:pulsegrowthgh@gmail.com"
+              className="font-medium text-accent hover:underline"
+            >
+              Email pulsegrowthgh@gmail.com
+            </a>
+          </div>
         </div>
       </div>
     </div>
